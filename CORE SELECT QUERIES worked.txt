@@ -1,0 +1,180 @@
+CORE SELECT QUERIES:
+
+
+BASIC HR SQL QUESTIONS
+
+Display all employees.
+
+Display employee name, job, and salary.
+
+List all departments.
+
+Display employees working in a specific department.
+
+Display employees whose salary is greater than 30,000.
+
+Display employees hired after 2022.
+
+Display employees whose job is ‘MANAGER’.
+
+Display distinct job roles.
+
+Display employees sorted by salary (descending).
+
+Display top 5 highest-paid employees.
+
+🔹 JOINS (VERY IMPORTANT 🔥)
+
+Display employee name along with department name.
+
+Display employees and their manager names (self join).
+
+Display employees who do not have a manager.
+
+Display department-wise employee count.
+
+Display employees along with job title and salary.
+
+Display employees working in the same department as a given employee.
+
+Display employees whose salary is higher than their manager.
+
+Display department name and total salary paid.
+
+Display departments with no employees.
+
+Display employee name, department, and manager name.
+
+🔹 SUBQUERIES 🔥
+
+Display employees earning more than the average salary.
+
+Display employees earning the highest salary.
+
+Display employees working in departments located in a specific city.
+
+Display employees whose salary is greater than any employee in HR department.
+
+Display employees whose salary is greater than all employees in SALES.
+
+Display employees who are not managers.
+
+Display employees who never received a salary hike.
+
+Display department with the maximum number of employees.
+
+Display employees who joined earliest.
+
+Display second highest salary.
+
+🔹 AGGREGATE & GROUP BY
+
+Display department-wise average salary.
+
+Display department-wise maximum and minimum salary.
+
+Display job-wise employee count.
+
+Display total salary paid per department.
+
+Display departments having more than 5 employees.
+
+Display job roles with average salary above 40,000.
+
+Display attendance count per employee.
+
+Display employees with attendance less than 20 days.
+
+Display department-wise attendance summary.
+
+Display employees with highest attendance.
+
+🔹 SALARY HISTORY (REAL-TIME 🔥)
+
+Display salary change history of employees.
+
+Display employees whose salary increased more than once.
+
+Display latest salary of each employee.
+
+Display employees who never got a salary hike.
+
+Display salary difference between current and previous salary.
+
+Display department-wise salary growth.
+
+Display highest salary hike.
+
+Display year-wise salary increments.
+
+Display employees promoted based on salary increase.
+
+Display employees with salary decrease.
+
+🔹 ATTENDANCE (HR USE CASE)
+
+Display total working days per employee.
+
+Display employees absent more than 5 days.
+
+Display monthly attendance report.
+
+Display employees with perfect attendance.
+
+Display department-wise attendance summary.
+
+Display employees with lowest attendance.
+
+Display attendance percentage per employee.
+
+Display employees eligible for bonus based on attendance.
+
+Display employees absent on a specific date.
+
+Display attendance trend per month.
+
+🔹 WINDOW FUNCTIONS / ANALYTICS 🔥🔥
+
+Display running total of salaries department-wise.
+
+Display rank of employees based on salary.
+
+Display difference between RANK and DENSE_RANK.
+
+Display previous and next employee salary using LAG/LEAD.
+
+Display salary difference using window functions.
+
+Display top 2 salaries per department.
+
+Display employees earning above department average.
+
+Display manager-wise salary distribution.
+
+Display department-wise highest-paid employee.
+
+Display employee salary percentile.
+
+🔹 BONUS (PROJECT VALUE ⭐)
+
+Identify inactive employees.
+
+Identify departments with high attrition.
+
+Identify costliest department.
+
+Identify underutilized employees.
+
+Identify salary anomalies.
+
+Identify employees due for appraisal.
+
+Identify managers with maximum team size.
+
+Identify departments exceeding salary budget.
+
+Identify employees without attendance records.
+
+End-to-end HR analytical report queries.
+
+✅ THIS VERSION IS:

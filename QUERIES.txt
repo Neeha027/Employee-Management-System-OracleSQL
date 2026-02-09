@@ -1,0 +1,572 @@
+CORE SELECT QUERIES:
+
+1)View all employees with department name?
+
+SQL QUERIE:
+
+SELECT e.emp_id,
+       e.emp_name,
+       d.dept_name,
+       e.salary
+FROM employees e
+JOIN departments d
+ON e.dept_id = d.dept_id;
+
+2)Find manager of each employee?
+
+SQL QUERIE:
+
+SELECT e.emp_name   AS employee,
+       m.emp_name   AS manager
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id;
+
+3)Employees earning more than department average?
+
+SQL QUERIE:
+
+SELECT emp_name, salary
+FROM employees e
+WHERE salary >
+(
+  SELECT AVG(salary)
+  FROM employees
+  WHERE dept_id = e.dept_id
+);
+
+4)Top earner in each department?
+
+SQL QUERIE:
+
+
+SELECT emp_name, dept_id, salary
+FROM (
+  SELECT emp_name,
+         dept_id,
+         salary,
+         RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) rnk
+  FROM employees
+)
+WHERE rnk = 1;
+
+5)Employees who never took leave?
+
+SQL QUERIE:
+
+SELECT e.emp_name
+FROM employees e
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM attendance a
+  WHERE a.emp_id = e.emp_id
+  AND a.status = 'ABSENT'
+);
+
+6)Salary hike history for employee?
+
+SQL QUERIE:
+
+SELECT e.emp_name,
+       s.old_salary,
+       s.new_salary,
+       s.change_date
+FROM employees e
+JOIN salary_history s
+ON e.emp_id = s.emp_id;
+
+7)Department-wise total salary cost?
+
+SQL QUERIE:
+
+
+SELECT d.dept_name,
+       SUM(e.salary) AS total_salary
+FROM employees e
+JOIN departments d
+ON e.dept_id = d.dept_id
+GROUP BY d.dept_name;
+
+INDEXING:
+
+CREATE INDEX idx_emp_dept_sal
+ON employees(dept_id, salary);
+
+
+
+BASIC HR QUERIES:
+
+
+-- 1. Display all employees
+SELECT * FROM employees;
+
+-- 2. Employee name, job, salary
+SELECT emp_name, job, salary FROM employees;
+
+-- 3. List all departments
+SELECT * FROM departments;
+
+-- 4. Employees in a specific department
+SELECT * FROM employees WHERE dept_id = 10;
+
+-- 5. Salary > 30000
+SELECT * FROM employees WHERE salary > 30000;
+
+-- 6. Hired after 2022
+SELECT * FROM employees 
+WHERE hire_date > DATE '2022-01-01';
+
+-- 7. Job = MANAGER
+SELECT * FROM employees WHERE job = 'MANAGER';
+
+-- 8. Distinct job roles
+SELECT DISTINCT job FROM employees;
+
+-- 9. Order by salary descending
+SELECT * FROM employees ORDER BY salary DESC;
+
+-- 10. Top 5 highest paid employees
+SELECT * FROM (
+  SELECT * FROM employees ORDER BY salary DESC
+) WHERE ROWNUM <= 5;
+
+
+JOINS:
+
+
+-- 11. Employee + Department name
+SELECT e.emp_name, d.dept_name
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id;
+
+-- 12. Employee and manager name (Self join)
+SELECT e.emp_name AS employee, m.emp_name AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.emp_id;
+
+-- 13. Employees without manager
+SELECT emp_name FROM employees
+WHERE manager_id IS NULL;
+
+-- 14. Department-wise employee count
+SELECT dept_id, COUNT(*) 
+FROM employees
+GROUP BY dept_id;
+
+-- 15. Employee + job + salary
+SELECT emp_name, job, salary FROM employees;
+
+-- 16. Employees in same dept as 'RAHUL'
+SELECT * FROM employees
+WHERE dept_id = (
+  SELECT dept_id FROM employees WHERE emp_name = 'RAHUL'
+);
+
+-- 17. Salary > manager salary
+SELECT e.emp_name
+FROM employees e
+JOIN employees m ON e.manager_id = m.emp_id
+WHERE e.salary > m.salary;
+
+-- 18. Department total salary
+SELECT d.dept_name, SUM(e.salary)
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+GROUP BY d.dept_name;
+
+-- 19. Departments with no employees
+SELECT d.dept_name
+FROM departments d
+LEFT JOIN employees e ON d.dept_id = e.dept_id
+WHERE e.emp_id IS NULL;
+
+-- 20. Employee, dept, manager
+SELECT e.emp_name, d.dept_name, m.emp_name AS manager
+FROM employees e
+LEFT JOIN departments d ON e.dept_id = d.dept_id
+LEFT JOIN employees m ON e.manager_id = m.emp_id;
+
+SUBQUERIES:
+
+
+-- 21. Salary > average salary
+SELECT * FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);
+
+-- 22. Highest salary
+SELECT * FROM employees
+WHERE salary = (SELECT MAX(salary) FROM employees);
+
+-- 23. Employees in HYDERABAD
+SELECT * FROM employees
+WHERE dept_id IN (
+  SELECT dept_id FROM departments WHERE location = 'HYDERABAD'
+);
+
+-- 24. Salary > ANY HR employee
+SELECT * FROM employees
+WHERE salary > ANY (
+  SELECT salary FROM employees WHERE dept_id = 20
+);
+
+-- 25. Salary > ALL SALES employees
+SELECT * FROM employees
+WHERE salary > ALL (
+  SELECT salary FROM employees WHERE dept_id = 30
+);
+
+-- 26. Employees who are not managers
+SELECT * FROM employees
+WHERE emp_id NOT IN (
+  SELECT manager_id FROM employees WHERE manager_id IS NOT NULL
+);
+
+-- 27. Employees with no salary hike
+SELECT * FROM employees
+WHERE emp_id NOT IN (
+  SELECT emp_id FROM salary_history
+);
+
+-- 28. Department with max employees
+SELECT dept_id FROM employees
+GROUP BY dept_id
+HAVING COUNT(*) = (
+  SELECT MAX(COUNT(*)) FROM employees GROUP BY dept_id
+);
+
+-- 29. Earliest joined employee
+SELECT * FROM employees
+WHERE hire_date = (SELECT MIN(hire_date) FROM employees);
+
+-- 30. Second highest salary
+SELECT MAX(salary)
+FROM employees
+WHERE salary < (SELECT MAX(salary) FROM employees);
+
+
+
+AGGREGATE & GROUP BY QUERIES:
+
+-- Department-wise average salary
+SELECT dept_id, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY dept_id;
+
+-- Department-wise max and min salary
+SELECT dept_id,
+       MAX(salary) AS max_salary,
+       MIN(salary) AS min_salary
+FROM employees
+GROUP BY dept_id;
+
+-- Job-wise employee count
+SELECT job, COUNT(*) AS emp_count
+FROM employees
+GROUP BY job;
+
+-- Total salary paid per department
+SELECT dept_id, SUM(salary) AS total_salary
+FROM employees
+GROUP BY dept_id;
+
+-- Departments having more than 5 employees
+SELECT dept_id
+FROM employees
+GROUP BY dept_id
+HAVING COUNT(*) > 5;
+
+-- Job roles with average salary above 40000
+SELECT job, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY job
+HAVING AVG(salary) > 40000;
+
+-- Attendance count per employee
+SELECT emp_id, COUNT(*) AS attendance_days
+FROM attendance
+GROUP BY emp_id;
+
+-- Employees with attendance less than 20 days
+SELECT emp_id, COUNT(*) AS days_present
+FROM attendance
+GROUP BY emp_id
+HAVING COUNT(*) < 20;
+
+-- Department-wise attendance summary
+SELECT e.dept_id, COUNT(a.att_date) AS total_attendance
+FROM employees e
+JOIN attendance a ON e.emp_id = a.emp_id
+GROUP BY e.dept_id;
+
+-- Employees with highest attendance
+SELECT emp_id
+FROM attendance
+GROUP BY emp_id
+HAVING COUNT(*) = (
+  SELECT MAX(COUNT(*)) FROM attendance GROUP BY emp_id
+);
+
+
+SALARY HISTORY (REAL-TIME):
+
+-- Salary change history
+SELECT * FROM salary_history;
+
+-- Employees whose salary increased more than once
+SELECT emp_id
+FROM salary_history
+GROUP BY emp_id
+HAVING COUNT(*) > 1;
+
+-- Latest salary of each employee
+SELECT emp_id, MAX(new_salary) AS latest_salary
+FROM salary_history
+GROUP BY emp_id;
+
+-- Employees who never got a salary hike
+SELECT emp_id FROM employees
+WHERE emp_id NOT IN (SELECT emp_id FROM salary_history);
+
+-- Salary difference (current vs previous)
+SELECT emp_id, (new_salary - old_salary) AS salary_diff
+FROM salary_history;
+
+-- Department-wise salary growth
+SELECT e.dept_id, SUM(sh.new_salary - sh.old_salary) AS salary_growth
+FROM employees e
+JOIN salary_history sh ON e.emp_id = sh.emp_id
+GROUP BY e.dept_id;
+
+-- Highest salary hike
+SELECT MAX(new_salary - old_salary) AS highest_hike
+FROM salary_history;
+
+-- Year-wise salary increments
+SELECT EXTRACT(YEAR FROM change_date) AS year,
+       SUM(new_salary - old_salary) AS total_increment
+FROM salary_history
+GROUP BY EXTRACT(YEAR FROM change_date);
+
+-- Employees promoted based on salary increase
+SELECT DISTINCT emp_id
+FROM salary_history
+WHERE new_salary > old_salary;
+
+-- Employees with salary decrease
+SELECT emp_id
+FROM salary_history
+WHERE new_salary < old_salary;
+
+ ATTENDANCE (HR USE CASE):
+
+
+-- Total working days per employee
+SELECT emp_id, COUNT(*) AS working_days
+FROM attendance
+GROUP BY emp_id;
+
+-- Employees absent more than 5 days
+SELECT emp_id, COUNT(*) AS absent_days
+FROM attendance
+WHERE status = 'ABSENT'
+GROUP BY emp_id
+HAVING COUNT(*) > 5;
+
+-- Monthly attendance report
+SELECT emp_id,
+       TO_CHAR(att_date, 'MM-YYYY') AS month,
+       COUNT(*) AS days_present
+FROM attendance
+GROUP BY emp_id, TO_CHAR(att_date, 'MM-YYYY');
+
+-- Employees with perfect attendance
+SELECT emp_id
+FROM attendance
+GROUP BY emp_id
+HAVING COUNT(*) = (
+  SELECT COUNT(DISTINCT att_date) FROM attendance
+);
+
+-- Department-wise attendance summary
+SELECT e.dept_id, COUNT(a.att_date) AS attendance_count
+FROM employees e
+JOIN attendance a ON e.emp_id = a.emp_id
+GROUP BY e.dept_id;
+
+-- Employees with lowest attendance
+SELECT emp_id
+FROM attendance
+GROUP BY emp_id
+HAVING COUNT(*) = (
+  SELECT MIN(COUNT(*)) FROM attendance GROUP BY emp_id
+);
+
+-- Attendance percentage per employee
+SELECT emp_id,
+       (COUNT(*) / (SELECT COUNT(DISTINCT att_date) FROM attendance)) * 100
+       AS attendance_percentage
+FROM attendance
+GROUP BY emp_id;
+
+-- Employees eligible for bonus (attendance > 90%)
+SELECT emp_id
+FROM attendance
+GROUP BY emp_id
+HAVING (COUNT(*) / (SELECT COUNT(DISTINCT att_date) FROM attendance)) * 100 > 90;
+
+-- Employees absent on specific date
+SELECT emp_id
+FROM attendance
+WHERE att_date = DATE '2024-01-15'
+AND status = 'ABSENT';
+
+-- Attendance trend per month
+SELECT TO_CHAR(att_date, 'MM-YYYY') AS month,
+       COUNT(*) AS total_attendance
+FROM attendance
+GROUP BY TO_CHAR(att_date, 'MM-YYYY');
+
+
+
+
+WINDOW FUNCTIONS:
+
+
+-- Running total of salaries department-wise
+SELECT emp_id, dept_id, salary,
+       SUM(salary) OVER (PARTITION BY dept_id ORDER BY salary) AS running_total
+FROM employees;
+
+-- Rank employees by salary
+SELECT emp_id, salary,
+       RANK() OVER (ORDER BY salary DESC) AS salary_rank
+FROM employees;
+
+-- Rank vs Dense Rank
+SELECT emp_id, salary,
+       RANK() OVER (ORDER BY salary DESC) AS rank_val,
+       DENSE_RANK() OVER (ORDER BY salary DESC) AS dense_rank_val
+FROM employees;
+
+-- Previous and next salary
+SELECT emp_id, salary,
+       LAG(salary) OVER (ORDER BY salary) AS prev_salary,
+       LEAD(salary) OVER (ORDER BY salary) AS next_salary
+FROM employees;
+
+-- Salary difference using window function
+SELECT emp_id, salary,
+       salary - LAG(salary) OVER (ORDER BY salary) AS salary_diff
+FROM employees;
+
+-- Top 2 salaries per department
+SELECT *
+FROM (
+  SELECT emp_id, dept_id, salary,
+         DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) rnk
+  FROM employees
+)
+WHERE rnk <= 2;
+
+-- Employees earning above department average
+SELECT emp_id, dept_id, salary
+FROM (
+  SELECT emp_id, dept_id, salary,
+         AVG(salary) OVER (PARTITION BY dept_id) avg_sal
+  FROM employees
+)
+WHERE salary > avg_sal;
+
+-- Manager-wise salary distribution
+SELECT manager_id, SUM(salary) AS total_team_salary
+FROM employees
+GROUP BY manager_id;
+
+-- Department-wise highest paid employee
+SELECT emp_id, dept_id, salary
+FROM (
+  SELECT emp_id, dept_id, salary,
+         RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) rnk
+  FROM employees
+)
+WHERE rnk = 1;
+
+-- Salary percentile
+SELECT emp_id, salary,
+       PERCENT_RANK() OVER (ORDER BY salary) AS salary_percentile
+FROM employees;
+
+
+BONUS:
+
+-- Inactive employees (no attendance)
+SELECT emp_id FROM employees
+WHERE emp_id NOT IN (SELECT emp_id FROM attendance);
+
+-- Departments with high attrition
+SELECT dept_id, COUNT(*) AS exits
+FROM employees
+WHERE status = 'INACTIVE'
+GROUP BY dept_id;
+
+-- Costliest department
+SELECT dept_id, SUM(salary) AS total_salary
+FROM employees
+GROUP BY dept_id
+ORDER BY total_salary DESC FETCH FIRST 1 ROW ONLY;
+
+-- Underutilized employees (low attendance)
+SELECT emp_id
+FROM attendance
+GROUP BY emp_id
+HAVING COUNT(*) < 10;
+
+-- Salary anomalies
+SELECT emp_id, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) * 2 FROM employees);
+
+-- Employees due for appraisal
+SELECT emp_id
+FROM employees
+WHERE ADD_MONTHS(hire_date, 12) <= SYSDATE;
+
+-- Managers with max team size
+SELECT manager_id, COUNT(*) AS team_size
+FROM employees
+GROUP BY manager_id
+ORDER BY team_size DESC;
+
+-- Departments exceeding salary budget
+SELECT dept_id
+FROM employees
+GROUP BY dept_id
+HAVING SUM(salary) > 1000000;
+
+-- Employees without attendance records
+SELECT emp_id FROM employees
+MINUS
+SELECT emp_id FROM attendance;
+
+-- End-to-end HR analytical report
+SELECT d.dept_name,
+       COUNT(e.emp_id) AS emp_count,
+       AVG(e.salary) AS avg_salary
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+GROUP BY d.dept_name;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

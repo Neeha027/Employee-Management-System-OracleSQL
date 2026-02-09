@@ -1,0 +1,76 @@
+CREATE TABLES (ORACLE SQL):
+
+1)DEPARTMENTS TABLE:
+
+CREATE TABLE departments (
+    dept_id     NUMBER PRIMARY KEY,
+    dept_name   VARCHAR2(50) NOT NULL,
+    location    VARCHAR2(50)
+);
+
+
+2)JOBS TABLE:
+
+CREATE TABLE jobs (
+    job_id      NUMBER PRIMARY KEY,
+    job_title   VARCHAR2(50) NOT NULL,
+    min_salary  NUMBER,
+    max_salary  NUMBER
+);
+
+3)EMPLOYEES TABLE:
+
+CREATE TABLE employees (
+    emp_id      NUMBER PRIMARY KEY,
+    emp_name    VARCHAR2(50) NOT NULL,
+    job_id      NUMBER,
+    dept_id     NUMBER,
+    manager_id  NUMBER,
+    hire_date   DATE,
+    salary      NUMBER,
+    status      VARCHAR2(10),
+
+    CONSTRAINT fk_emp_job FOREIGN KEY (job_id)
+        REFERENCES jobs(job_id),
+
+    CONSTRAINT fk_emp_dept FOREIGN KEY (dept_id)
+        REFERENCES departments(dept_id),
+
+    CONSTRAINT fk_emp_mgr FOREIGN KEY (manager_id)
+        REFERENCES employees(emp_id)
+);
+
+4)SALARY_HISTORY TABLE:
+
+CREATE TABLE salary_history (
+    emp_id       NUMBER,
+    old_salary   NUMBER,
+    new_salary   NUMBER,
+    change_date  DATE,
+
+    CONSTRAINT fk_sal_emp FOREIGN KEY (emp_id)
+        REFERENCES employees(emp_id)
+);
+
+5)ATTENDANCE TABLE:
+
+CREATE TABLE attendance (
+    emp_id     NUMBER,
+    work_date DATE,
+    status    VARCHAR2(10),
+
+    CONSTRAINT fk_att_emp FOREIGN KEY (emp_id)
+        REFERENCES employees(emp_id)
+);
+
+6)PERFORMANCE_REVIEWS TABLE:
+
+CREATE TABLE performance_reviews (
+    emp_id      NUMBER,
+    review_date DATE,
+    rating      NUMBER,
+    remarks     VARCHAR2(100),
+
+    CONSTRAINT fk_perf_emp FOREIGN KEY (emp_id)
+        REFERENCES employees(emp_id)
+);
